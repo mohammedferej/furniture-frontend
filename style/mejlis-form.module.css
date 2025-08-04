@@ -1,0 +1,43 @@
+/* styles/mejlis-form.css */
+
+/* Form container */
+.mejlis-form-container {
+  @apply max-w-4xl mx-auto p-6;
+}
+
+/* Review step styles */
+.mejlis-review-section {
+  @apply space-y-6;
+}
+
+.mejlis-review-title {
+  @apply text-xl font-semibold text-gray-800 dark:text-gray-200 pb-2 border-b border-gray-200 dark:border-gray-700;
+}
+
+.mejlis-review-data {
+  @apply bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 overflow-x-auto;
+}
+
+.mejlis-review-pre {
+  @apply text-sm font-mono text-gray-700 dark:text-gray-300;
+}
+
+.mejlis-visualizer-container {
+  @apply p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm;
+}
+
+/* Responsive grid for review items */
+.mejlis-review-grid {
+  @apply grid gap-6;
+}
+
+@media (min-width: 768px) {
+  .mejlis-review-grid {
+    @apply grid-cols-2;
+  }
+}
+
+/* Form step transitions */
+.mejlis-step-transition {
+  @apply transition-all duration-300 ease-in-out;
+}

@@ -1,0 +1,32 @@
+/* styles/globals.css */
+
+body {
+  margin: 0;
+  font-family: sans-serif;
+}
+
+/* Toast styles */
+.custom-toast {
+  background-color: #1e3a8a; /* dark blue (similar to bg-blue-950) */
+  color: white;
+  padding: 1rem 1.25rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.3s ease-in-out;
+}
+
+.custom-toast[data-type="error"] {
+  background-color: #dc2626; /* red */
+}
+
+.custom-toast[data-type="success"] {
+  background-color: #16a34a; /* green */
+}
+
+.custom-toast[data-type="info"] {
+  background-color: #2563eb; /* blue */
+}

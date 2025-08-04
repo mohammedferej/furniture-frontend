@@ -1,0 +1,297 @@
+@import "@tailwindcss/postcss/import";
+@tailwind utilities;
+
+
+
+@layer components {
+  .navbar {
+    @apply justify-between shadow-md shadow-black/15 h-[6rem] pt-[10px] bg-white pl-[20px] pr-0;
+  }
+}
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+.body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
+.backgroudd {
+  background: linear-gradient(to bottom, transparent, #008083);
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+.move-top {
+  z-index: 9999;
+  /* transform:
+      scale(0.75)
+      rotateY(-30deg)
+      rotateX(45deg)
+      translateZ(4.5rem); */
+  transform-origin: 50% 100%;
+  transform-style: preserve-3d;
+  box-shadow: 1rem 1rem 2rem rgba(0, 0, 0, 0.25);
+  transition: 0.6s ease transform;
+
+  &:hover {
+    transform: scale(1);
+  }
+
+  &::before {
+    transform: translateZ(4rem);
+    &:hover {
+      transform: translateZ(0);
+    }
+  }
+
+  &::after {
+    transform: translateZ(-4rem);
+    &:hover {
+      transform: translateZ(-1px);
+    }
+  }
+}
+
+.toast {
+  top: 50% !important;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex; /* Enable flexbox for layout */
+  flex-direction: column; /* Stack elements vertically */
+  align-items: center; /* Center elements horizontally */
+  padding: 2rem !important; /* Add some padding */
+  background-color: #f5f5f5; /* Light background color */
+  border-radius: 5px; /* Rounded corners */
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.15); /* Subtle shadow for depth */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif; /* Modern font stack */
+}
+
+.toast-icon {
+  /* Styles for your icon element (replace with your icon component or class) */
+  margin-bottom: 10.5rem !important; /* Add space between icon and label */
+  font-size: 1.2rem !important; /* Adjust icon size as needed */
+  color: #f00; /* Example error color */
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.toast-label {
+  font-weight: bold !important;
+}
+
+.toast.toast-success {
+  background-color: #dff0d8; /* Green background for success toast */
+  color: #468873; /* Darker green text */
+}
+
+.toast.toast-error {
+  background-color: #f2dede; /* Red background for error toast */
+  color: #a94442; /* Darker red text */
+}
+
+/* Optional styles for other toast types (warning, info) */
+
+.logo {
+  transition: transform 0.3s ease-in-out; /* Add transition effect */
+}
+
+.logo:hover {
+  transform: scale(1.05); /* Scale up on hover */
+}
+
+.avatar {
+  transition: transform 0.3s ease-in-out; /* Add transition effect */
+}
+
+.avatar:hover {
+  transform: scale(1.1); /* Scale up on hover */
+}
+
+.max-w-\[1024px\] {
+  max-width: 100% !important ;
+}
+
+.flex-grow {
+  flex-grow: 9 !important ;
+}
+.data-\[justify\=start\]\:flex-grow[data-justify="start"] {
+  flex-grow: 0 !important;
+}
+.react-confirm-alert-overlay {
+  background-color: rgba(0, 0, 0, 0.7) !important; /* Change background color */
+}
+
+.react-confirm-alert-body {
+  text-align: center !important;
+}
+.react-confirm-alert-button-group {
+  justify-content: center !important;
+}
+
+.react-confirm-alert-button-group .react-confirm-alert-button:last-child {
+  background-color: red !important;
+  color: white !important;
+  border: none !important;
+}
+
+.text-secondary {
+  color: #008083 !important;
+}
+
+.border-b-primary {
+  --tw-border-opacity: 1;
+  border-bottom-color: #008083 !important;
+}
+
+.ring-secondary {
+  --tw-ring-opacity: 1 !important;
+  --tw-ring-color: #008083 !important;
+}
+.bg-primary {
+  --tw-bg-opacity: 1 !important;
+  background-color: #008083 !important;
+}
+
+.ocean {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 254, 234, 1) 0%,
+    rgba(255, 254, 234, 1) 35%,
+    #b7e8eb 100%
+  );
+  overflow: hidden;
+}
+
+.wave {
+  background: url("/wave.svg") repeat-x;
+  position: absolute;
+  bottom: 0px;
+  width: 6400px;
+  height: 140px;
+  transform: translate3d(0, 0, 0);
+}
+
+/* .wave:nth-of-type(2) {
+    top: -175px;
+    animation: wave 7s cubic-bezier( 0.36, 0.45, 0.63, 0.53) -.125s infinite, swell 7s ease -1.25s infinite;
+    opacity: 1;
+  } */
+
+/* @keyframes wave {
+    0% {
+      margin-left: 0;
+    }
+    100% {
+      margin-left: -1600px;
+    }
+  }
+  
+  @keyframes swell {
+    0%, 100% {
+      transform: translate3d(0,-25px,0);
+    }
+    50% {
+      transform: translate3d(0,5px,0);
+    }
+  } */
+
+.containeraddisland {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.shadows {
+  position: relative;
+  text-transform: uppercase;
+  text-shadow: -15px 5px 20px #ced0d3;
+  color: white;
+  letter-spacing: -0.05em;
+  font-family: "Anton", Arial, sans-serif;
+  user-select: none;
+  text-transform: uppercase;
+  font-size: 150px;
+  transition: all 0.25s ease-out;
+}
+.shadows:hover {
+  text-shadow: -16px 6px 15px #ced0d3;
+}
+
+.addislandcss {
+  padding-top: 10px;
+  background-color: #444;
+  color: transparent;
+  font:
+    bold 2em "Poppins",
+    sans-serif;
+  -webkit-background-clip: text;
+  -moz-background-clip: text;
+  background-clip: text;
+  text-shadow: 2px 2px 3px rgba(255, 255, 255, 0.65);
+}
+
+.button-73 {
+  appearance: none;
+  background-color: #008083;
+  border-radius: 8px;
+  border-style: none;
+  /* box-shadow: #008083 0 -12px 6px inset; */
+  box-sizing: border-box;
+  color: #ffffff;
+  cursor: pointer;
+  display: inline-block;
+  font-family: -apple-system, sans-serif;
+  letter-spacing: -0.24px;
+  outline: none;
+  quotes: auto;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.15s;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.button-73:hover {
+  background-color: #008083;
+  /* box-shadow: #FF6314 0 -6px 8px inset; */
+  transform: scale(1.125);
+}
+
+.button-73:active {
+  transform: scale(1.025);
+}
+
+@media (min-width: 768px) {
+  .button-73 {
+    padding: 0.5rem 1rem;
+  }
+}

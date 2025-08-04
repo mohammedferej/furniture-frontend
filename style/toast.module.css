@@ -1,0 +1,22 @@
+/* toast.module.css */
+.toast {
+  background-color: #1e293b; /* slate-800 */
+  color: #fefefe;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.15);
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.toastError {
+  background-color: #dc2626; /* red-600 */
+  color: #fff;
+}
+
+.toastSuccess {
+  background-color: #16a34a; /* green-600 */
+  color: #fff;
+}
