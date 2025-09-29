@@ -1,21 +1,20 @@
-
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { formSchema } from "@/lib/formSchema";
+import { submitRoomData, updateRoomData } from "@/lib/mejlis.service";
 import { zodResolver } from "@hookform/resolvers/zod";
-import styles from '../style/mejlis-form.module.css';
-import router, { useRouter } from 'next/navigation'
+
+import { useRouter } from "next/navigation";
+import { useCallback, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
+import styles from "../style/mejlis-form.module.css";
 import { CustomerDetailsForm } from "./CustomerDetailsForm";
 import { MaterialDetailsForm } from "./MaterialDetailsForm";
-import { RoomDetailsForm } from "./RoomDetailsForm";
 import { MultiStepFormWrapper } from "./MultiStepFormWrapper";
+import { RoomDetailsForm } from "./RoomDetailsForm";
 import RoomVisualizer from "./RoomVisualizer";
-import { getRoomOrderById, submitRoomData, updateRoomData } from "@/lib/mejlis.service";
-import { toast } from "sonner";
-
-import {formSchema} from '@/lib/formSchema'
 
 type FormValues = z.infer<typeof formSchema>;
 
@@ -24,23 +23,25 @@ type FormStep = {
   content: React.ReactNode;
   canProceed?: () => boolean | string;
 };
-// components/MejlisFormParent.tsx
+
 interface MejlisFormParentProps {
-  initialData?: FormValues
-  orderId?: string
+  initialData?: FormValues;
+  orderId?: string;
 }
 
-export default function MejlisFormParent({ initialData, orderId }: MejlisFormParentProps) {
-
+export default function MejlisFormParent({
+  initialData,
+  orderId,
+}: MejlisFormParentProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sides, setSides] = useState<number[]>([]);
   const [segments, setSegments] = useState<Record<string, number[]>>({});
   const svgExportRef = useRef<SVGSVGElement>(null);
-const router=useRouter()
+  const router = useRouter();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema) as any,
-    defaultValues: {
+    defaultValues: initialData ?? {
       customerName: "",
       phone: "",
       address: "",
@@ -59,136 +60,120 @@ const router=useRouter()
       app_front: 0,
       has_table: false,
       remaining_payment: 0,
-      material_made_from:"",
-      
+      material_made_from: "",
     },
   });
 
   const updateSides = useCallback((s: number[]) => setSides(s), []);
   const updateSegments = useCallback(
     (seg: Record<string, number[]>) => setSegments(seg),
-    [],
+    []
   );
 
-
-
-  const canSubmitForm = () => {
-  const isFormValid = form.formState.isValid;
-  const areSegmentsValid = segmentsAreValid();
-  
-  console.log('Validation Details:', {
-    isFormValid,
-    areSegmentsValid,
-    invalidFields: Object.entries(form.formState.errors)
-      .filter(([_, error]) => error)
-      .map(([name]) => name),
-    formValues: form.getValues()
-  });
-
-  return isFormValid && areSegmentsValid;
-};
-
-  // Enhanced submit handler
-const onSubmit = async (data: FormValues) => {
-  // Convert string numbers to actual numbers
-  const processedData = {
-    ...data,
-    uplift_or_height: Number(data.uplift_or_height),
-    price_per_meter: Number(data.price_per_meter),
-    total_price: Number(data.price_per_meter * data.room_size),
-    app_front: Number(data.app_front),
-    remaining_payment: Number((data.price_per_meter * data.room_size )- data.app_front),
-   // advance_payment: Number(data.advance_payment || 0)
-  };
-
-  if (!segmentsAreValid()) {
-    toast.warning("Invalid Room Configuration", {
-      description: "Please check your room segments configuration",
-    });
-    return;
-  }
-
-  setIsSubmitting(true);
-   try {
-      if (orderId) {
-  try {
-    await updateRoomData(orderId, {
-      ...processedData,
-      segments,
-    });
-
-    toast.success("Order Updated Successfully!", {
-      description: `Order ${processedData.order_code} has been updated`,
-    });
-
-    router.push("/order-mejlis");
-  } catch (err: any) {
-    toast.error("Failed to update order", {
-      description: err.message || "Please try again later",
-    });
-  }
-}
- else {
-
-    const result = await submitRoomData({
-      ...processedData,
-      segments,
-    });
-    
-    toast.success("Order Submitted Successfully!", {
-      description: `Order ${processedData.order_code} has been created`,
-     
-    });
-      window.location.href = '/orders';
-  }
-    // Optional: reset form after successful submission
-    // form.reset();
-    
-  } catch (error: any) {
-    let errorMessage = "Failed to submit order";
-    let description = "Please try again later";
-    
-    if (error.message.includes("UNIQUE constraint failed: order_order.order_code")) {
-      errorMessage = "Duplicate Order Code";
-      description = "This order code already exists. Please use a unique code.";
-    } 
-    else if (error.message.includes("MejlisMaterial() got unexpected keyword arguments: 'table'")) {
-      errorMessage = "Server Configuration Error";
-      description = "The table field is not properly configured on the server";
-    }
-    else if (error.message.includes("Unexpected token '<'")) {
-      errorMessage = "Server Error";
-      description = "The server returned an unexpected response";
-    }
-    else if (error.message) {
-      description = error.message;
-    }
-
-    toast.error(errorMessage, {
-      description,
-      action: {
-        label: "Retry",
-        onClick: () => onSubmit(data),
-      },
-    });
-  } finally {
-    setIsSubmitting(false);
-  }
-};
   const segmentsAreValid = () =>
-    Object.entries(segments).every(([_, segs], i) =>
-      segs.reduce((a, b) => a + b, 0) === sides[i],
+    Object.entries(segments).every(
+      ([_, segs], i) => segs.reduce((a, b) => a + b, 0) === sides[i]
     );
 
+  const canSubmitForm = () => {
+    const isFormValid = form.formState.isValid;
+    const areSegmentsValid = segmentsAreValid();
 
+    console.log("Validation Details:", {
+      isFormValid,
+      areSegmentsValid,
+      invalidFields: Object.entries(form.formState.errors)
+        .filter(([_, error]) => error)
+        .map(([name]) => name),
+      formValues: form.getValues(),
+    });
+
+    return isFormValid && areSegmentsValid;
+  };
+
+  const onSubmit = async (data: FormValues) => {
+    const processedData = {
+      ...data,
+      uplift_or_height: Number(data.uplift_or_height),
+      price_per_meter: Number(data.price_per_meter),
+      total_price: Number(data.price_per_meter * data.room_size),
+      app_front: Number(data.app_front),
+      remaining_payment: Number(
+        data.price_per_meter * data.room_size - data.app_front
+      ),
+    };
+
+    if (!segmentsAreValid()) {
+      toast.warning("Invalid Room Configuration", {
+        description: "Please check your room segments configuration",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      if (orderId) {
+        await updateRoomData(orderId, { ...processedData, segments });
+        toast.success("Order Updated Successfully!", {
+          description: `Order ${processedData.order_code} has been updated`,
+        });
+        router.push("/order-mejlis");
+      } else {
+        await submitRoomData({ ...processedData, segments });
+        toast.success("Order Submitted Successfully!", {
+          description: `Order ${processedData.order_code} has been created`,
+        });
+        window.location.href = "/orders";
+      }
+    } catch (error: any) {
+      let errorMessage = "Failed to submit order";
+      let description = error.message || "Please try again later";
+
+      if (
+        error.message.includes(
+          "UNIQUE constraint failed: order_order.order_code"
+        )
+      ) {
+        errorMessage = "Duplicate Order Code";
+        description =
+          "This order code already exists. Please use a unique code.";
+      } else if (
+        error.message.includes(
+          "MejlisMaterial() got unexpected keyword arguments: 'table'"
+        )
+      ) {
+        errorMessage = "Server Configuration Error";
+        description =
+          "The table field is not properly configured on the server";
+      } else if (error.message.includes("Unexpected token '<'")) {
+        errorMessage = "Server Error";
+        description = "The server returned an unexpected response";
+      }
+
+      toast.error(errorMessage, {
+        description,
+        action: { label: "Retry", onClick: () => onSubmit(data) },
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const steps: FormStep[] = [
     {
       label: "Customer Details",
-      content: <CustomerDetailsForm register={form.register} errors={form.formState.errors} />,
+      content: (
+        <CustomerDetailsForm
+          register={form.register}
+          errors={form.formState.errors}
+        />
+      ),
       canProceed: () => {
         const { customerName, phone, address } = form.formState.errors;
-        return !customerName && !phone && !address || "Please fill in all required fields";
+        return (
+          (!customerName && !phone && !address) ||
+          "Please fill in all required fields"
+        );
       },
     },
     {
@@ -203,7 +188,10 @@ const onSubmit = async (data: FormValues) => {
       ),
       canProceed: () => {
         const { material_made_from, design_type } = form.formState.errors;
-        return !material_made_from&& !design_type || "Please select material details";
+        return (
+          (!material_made_from && !design_type) ||
+          "Please select material details"
+        );
       },
     },
     {
@@ -219,7 +207,8 @@ const onSubmit = async (data: FormValues) => {
           errors={form.formState.errors}
         />
       ),
-      canProceed: () => segmentsAreValid() || "Invalid room segments configuration",
+      canProceed: () =>
+        segmentsAreValid() || "Invalid room segments configuration",
     },
     {
       label: "Review",
@@ -234,7 +223,6 @@ const onSubmit = async (data: FormValues) => {
                 </pre>
               </div>
             </div>
-            
             <div>
               <h3 className={styles.mejlisReviewTitle}>Sides Configuration</h3>
               <div className={styles.mejlisReviewData}>
@@ -244,7 +232,6 @@ const onSubmit = async (data: FormValues) => {
               </div>
             </div>
           </div>
-
           <div>
             <h3 className={styles.mejlisReviewTitle}>Room Visualization</h3>
             <div className={styles.mejlisVisualizerContainer}>
@@ -254,64 +241,45 @@ const onSubmit = async (data: FormValues) => {
               />
             </div>
           </div>
-
           <div>
             <h3 className={styles.mejlisReviewTitle}>Order Summary</h3>
             <div className={styles.mejlisReviewData}>
               <pre className={styles.mejlisReviewPre}>
-                {JSON.stringify({
-                  customer: {
-                    name: form.watch("customerName"),
-                    phone: form.watch("phone"),
-                    address: form.watch("address")
+                {JSON.stringify(
+                  {
+                    customer: {
+                      name: form.watch("customerName"),
+                      phone: form.watch("phone"),
+                      address: form.watch("address"),
+                    },
+                    order: {
+                      code: form.watch("order_code"),
+                      type: form.watch("material_made_from"),
+                      design: form.watch("design_type"),
+                      received: form.watch("receive_order_at"),
+                      completed: form.watch("completed_order_at"),
+                    },
+                    dimensions: {
+                      size: form.watch("room_size"),
+                      shape: form.watch("room_shape"),
+                    },
+                    payment: {
+                      total: form.watch("total_price"),
+                      remaining: form.watch("remaining_payment"),
+                    },
                   },
-                  order: {
-                    code: form.watch("order_code"),
-                    type: form.watch("material_made_from"),
-                    design: form.watch("design_type"),
-                    received: form.watch("receive_order_at"),
-                    completed: form.watch("completed_order_at")
-                  },
-                  dimensions: {
-                    size: form.watch("room_size"),
-                    shape: form.watch("room_shape")
-                  },
-                  payment: {
-                    total: form.watch("total_price"),
-                    //advance: form.watch("advance_payment"),
-                    remaining: form.watch("remaining_payment")
-                  }
-                }, null, 2)}
+                  null,
+                  2
+                )}
               </pre>
             </div>
           </div>
         </div>
       ),
-    }
+    },
   ];
-  // Temporary debug component - remove after fixing
-const DebugInfo = () => (
-  <div style={{
-    position: 'fixed',
-    bottom: 0,
-    left: 0,
-    background: 'white',
-    padding: '10px',
-    zIndex: 9999,
-    maxHeight: '200px',
-    overflow: 'auto'
-  }}>
-    <h4>Form Debug:</h4>
-    <pre>{JSON.stringify({
-      values: form.watch(),
-      errors: form.formState.errors,
-      isValid: form.formState.isValid,
-      segmentsValid: segmentsAreValid(),
-      canSubmit: canSubmitForm()
-    }, null, 2)}</pre>
-  </div>
-);
- return (
+
+  return (
     <div className={styles.mejlisFormContainer}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <MultiStepFormWrapper
@@ -321,7 +289,6 @@ const DebugInfo = () => (
           isSubmitting={isSubmitting}
         />
       </form>
-      <DebugInfo />
     </div>
   );
 }

@@ -1,23 +1,24 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { ColumnDef } from "@tanstack/react-table";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/data-table";
-import { useDebounce } from "use-debounce";
-import { AuthService } from "@/lib/services";
-import { UserEditModal } from "@/components/UserEditModal";
-import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { UserEditModal } from "@/components/UserEditModal";
+import { AuthService } from "@/lib/services";
+import { User } from "@/types";
+import { ColumnDef } from "@tanstack/react-table";
 import { Ban, Edit, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { useDebounce } from "use-debounce";
 
 interface PaginatedUsers {
   count: number;
@@ -72,7 +73,7 @@ export default function UsersPage() {
 
   const confirmAction = async () => {
     if (!userIdToAction) return;
-    
+
     try {
       if (actionType === "delete") {
         await AuthService.deleteUser(userIdToAction);
@@ -92,20 +93,26 @@ export default function UsersPage() {
   };
 
   const columns: ColumnDef<User>[] = [
-    { 
-      accessorKey: "first_name", 
+    {
+      accessorKey: "first_name",
       header: "First Name",
-      cell: ({ row }) => <span className="font-medium">{row.getValue("first_name")}</span>
+      cell: ({ row }) => (
+        <span className="font-medium">{row.getValue("first_name")}</span>
+      ),
     },
-    { 
-      accessorKey: "last_name", 
+    {
+      accessorKey: "last_name",
       header: "Last Name",
-      cell: ({ row }) => <span className="font-medium">{row.getValue("last_name")}</span>
+      cell: ({ row }) => (
+        <span className="font-medium">{row.getValue("last_name")}</span>
+      ),
     },
-    { 
-      accessorKey: "username", 
+    {
+      accessorKey: "username",
       header: "Username",
-      cell: ({ row }) => <span className="text-blue-600">{row.getValue("username")}</span>
+      cell: ({ row }) => (
+        <span className="text-blue-600">{row.getValue("username")}</span>
+      ),
     },
     {
       id: "actions",
@@ -119,25 +126,25 @@ export default function UsersPage() {
               variant="brand"
               onClick={() => handleUpdate(user)}
             >
-               <Edit className="size-4" />
+              <Edit className="size-4" />
               Update
             </Button>
             <Button
               size="sm"
               variant="delete"
-            //  className="hover:bg-red-100 text-red-600"
+              //  className="hover:bg-red-100 text-red-600"
               onClick={() => handleDeleteClick(user.id)}
             >
-               <Trash2 className="size-4" />
+              <Trash2 className="size-4" />
               Delete
             </Button>
             <Button
               size="sm"
               variant="block"
-             // className="hover:bg-yellow-100 text-yellow-600"
+              // className="hover:bg-yellow-100 text-yellow-600"
               onClick={() => handleBlockClick(user.id)}
             >
-               <Ban className="size-4" />
+              <Ban className="size-4" />
               Block
             </Button>
           </div>
@@ -150,7 +157,9 @@ export default function UsersPage() {
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto">
         <div className="bg-white rounded-lg shadow-sm p-6">
-          <h1 className="text-2xl font-bold mb-6 text-amber-500">User Management</h1>
+          <h1 className="text-2xl font-bold mb-6 text-amber-500">
+            User Management
+          </h1>
 
           <div className="mb-6 flex justify-between items-center">
             <Input
@@ -182,21 +191,23 @@ export default function UsersPage() {
             </Button>
 
             <div className="flex items-center gap-2">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <Button
-                  key={page}
-                  variant={currentPage === page ? "brand" : "outline"}
-                  size="sm"
-                  onClick={() => setCurrentPage(page)}
-                  className={`w-10 h-10 ${
-                    currentPage === page 
-                      ? 'bg-amber-500 text-white hover:bg-amber-600' 
-                      : 'border-gray-300 text-gray-700 hover:bg-gray-100'
-                  }`}
-                >
-                  {page}
-                </Button>
-              ))}
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <Button
+                    key={page}
+                    variant={currentPage === page ? "brand" : "outline"}
+                    size="sm"
+                    onClick={() => setCurrentPage(page)}
+                    className={`w-10 h-10 ${
+                      currentPage === page
+                        ? "bg-amber-500 text-white hover:bg-amber-600"
+                        : "border-gray-300 text-gray-700 hover:bg-gray-100"
+                    }`}
+                  >
+                    {page}
+                  </Button>
+                )
+              )}
             </div>
 
             <Button
@@ -241,30 +252,30 @@ export default function UsersPage() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-  <Button
-    variant="outline"
-    onClick={() => setIsConfirmOpen(false)}
-    className="border-gray-300 text-gray-700 hover:bg-gray-100"
-  >
-    Cancel
-  </Button>
-  <Button
-    variant={actionType === "delete" ? "delete" : "block"}
-    onClick={confirmAction}
-  >
-    {actionType === "delete" ? (
-      <>
-        <Trash2 className="size-4" />
-        <span>Confirm Delete</span>
-      </>
-    ) : (
-      <>
-        <Ban className="size-4" />
-        <span>Confirm Block</span>
-      </>
-    )}
-  </Button>
-</DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsConfirmOpen(false)}
+              className="border-gray-300 text-gray-700 hover:bg-gray-100"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant={actionType === "delete" ? "delete" : "block"}
+              onClick={confirmAction}
+            >
+              {actionType === "delete" ? (
+                <>
+                  <Trash2 className="size-4" />
+                  <span>Confirm Delete</span>
+                </>
+              ) : (
+                <>
+                  <Ban className="size-4" />
+                  <span>Confirm Block</span>
+                </>
+              )}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

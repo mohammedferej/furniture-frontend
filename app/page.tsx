@@ -1,47 +1,35 @@
+// app/page.tsx
+"use client";
 
-"use client"
-import Image from "next/image";
-import DashboardPage from "./(protected)/dashboard/page";
+import { useAuth } from "@/components/providers/AuthProvider";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ACCESS_TOKEN } from "@/constants";
-import { AuthService } from "@/lib/services";
-import Cookies  from 'js-cookie'
-import { redirect } from "next/navigation";
+import DashboardPage from "./(protected)/dashboard/page";
+
 export default function Home() {
+  const { user, loading, hasPermission } = useAuth();
+  const router = useRouter();
+  const [authorized, setAuthorized] = useState(false);
 
-    const  [loading, setLoading] = useState(true);
-     const [ user,setUser]  = useState<null | User>(null);
-     
   useEffect(() => {
-    const initAuth = async () => {
-      const accessToken = Cookies.get(ACCESS_TOKEN);
-      if (accessToken) {
-        try {
-          const res = await AuthService.getUserProfile();
-          if (res) {
-            setUser(res);
-          }
-        } catch (error) {
-          console.error('Failed to fetch user data:', error);
-          AuthService.logout();
-        }
+    if (!loading) {
+      if (!user) {
+        router.push("/login");
+      } else if (!hasPermission("can_view_dashboard")) {
+        router.push("/unauthorized"); // optional page
+      } else {
+        setAuthorized(true);
       }
-      setLoading(false);
-    };
-    
-    initAuth();
-  }, []);
+    }
+  }, [loading, user, hasPermission, router]);
 
-  if (loading) {
-    return <div className=' min-h-screen flex items-center justify-center font-bold bg-gray-100'>Loading...</div>;
+  if (loading || !authorized) {
+    return (
+      <div className="min-h-screen flex items-center justify-center font-bold">
+        Loading...
+      </div>
+    );
   }
 
-  if (!user && !loading) {
-    return redirect('/login');
-  }
-  return (
- <div className=" font-semibold text-2xl text-center mt-10 w-full">
-  <DashboardPage/>
- </div>
-  );
+  return <DashboardPage />;
 }

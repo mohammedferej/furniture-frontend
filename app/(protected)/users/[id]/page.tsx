@@ -1,10 +1,10 @@
 "use client";
 
-import { AuthService } from "@/lib/services";
-import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { FiCheck, FiMail, FiUser } from "react-icons/fi";
+import { AuthService } from "@/lib/services";
 import { toast } from "sonner";
+import { FiMail, FiUser, FiCheck } from "react-icons/fi";
+import { useParams, useRouter } from "next/navigation";
 
 interface Errors {
   username?: string;
@@ -32,7 +32,7 @@ const UserUpdatePage = () => {
     const fetchUser = async () => {
       try {
         const user = await AuthService.getUserById(userId as string);
-        console.log(user);
+        console.log(user)
         setFormData({
           username: user.username,
           first_name: user.first_name,

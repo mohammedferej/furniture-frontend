@@ -1,6 +1,13 @@
- interface User {
+// types.d.ts
+export interface Group {
   id: string;
-  username:string;
+  name: string;
+  permissions: string[]; // permission codenames
+}
+
+interface User {
+  id: string;
+  username: string;
   email?: string;
   first_name: string;
   last_name: string;
@@ -15,20 +22,24 @@
   updated_at: string;
   profile_completion_percentage: number;
   is_profile_complete: boolean;
+
+  // NEW: groups & permissions
+  groups?: string[];
+  permissions?: string[];
 }
 
- interface AuthTokens {
+export interface AuthTokens {
   access: string;
   refresh: string;
 }
 
- interface LoginResponse {
+export interface LoginResponse {
   access: string;
   refresh: string;
   user: User;
 }
 
- interface RegisterData {
+export interface RegisterData {
   username: string;
   first_name: string;
   last_name: string;
@@ -36,23 +47,8 @@
   password2: string;
 }
 
-interface RegisterResponse {
-    username:string,
-    user_id:string,
-    message:string
-}
-
-interface VerifyEmailResponse {
+export interface RegisterResponse {
+  username: string;
+  user_id: string;
   message: string;
-  refresh:string;
-  access:string;
-  user:User;
 }
-
-// export interface User {
-//   id: string;
-//   username: string;
-//   first_name: string;
-//   last_name: string;
-//   email?: string;
-// }

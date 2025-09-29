@@ -1,32 +1,29 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-//   content: [
-//     './components/**/*.{js,ts,jsx,tsx,mdx}',
-//     './app/**/*.{js,ts,jsx,tsx,mdx}',
-//   ],
-    content: [
+  content: [
     "./app/**/*.{js,ts,jsx,tsx}",
     "./pages/**/*.{js,ts,jsx,tsx}",
     "./components/**/*.{js,ts,jsx,tsx}",
-    "./node_modules/sonner/**/*.{js,ts,jsx,tsx}"
+    "./node_modules/sonner/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
       fontFamily: {
         sans: ["var(--font-sans)"],
         mono: ["var(--font-geist-mono)"],
-        colors: {
-        border: 'hsl(var(--border))',
-        borderDark: 'hsl(var(--border-dark))',
-        sidebar: 'hsl(var(--sidebar))',
-        sidebarDark: 'hsl(var(--sidebar-dark))',
-        sidebarForeground: 'hsl(var(--sidebar-foreground))',
-        sidebarForegroundDark: 'hsl(var(--sidebar-foreground-dark))',
-        sidebarAccent: 'hsl(var(--sidebar-accent))',
-        sidebarAccentDark: 'hsl(var(--sidebar-accent-dark))',
-        sidebarAccentForeground: 'hsl(var(--sidebar-accent-foreground))',
-        sidebarAccentForegroundDark: 'hsl(var(--sidebar-accent-foreground-dark))',
       },
+      colors: {
+        border: "hsl(var(--border))",
+        borderDark: "hsl(var(--border-dark))",
+        sidebar: "hsl(var(--sidebar))",
+        sidebarDark: "hsl(var(--sidebar-dark))",
+        sidebarForeground: "hsl(var(--sidebar-foreground))",
+        sidebarForegroundDark: "hsl(var(--sidebar-foreground-dark))",
+        sidebarAccent: "hsl(var(--sidebar-accent))",
+        sidebarAccentDark: "hsl(var(--sidebar-accent-dark))",
+        sidebarAccentForeground: "hsl(var(--sidebar-accent-foreground))",
+        sidebarAccentForegroundDark:
+          "hsl(var(--sidebar-accent-foreground-dark))",
       },
       keyframes: {
         wave: {
@@ -46,4 +43,4 @@ module.exports = {
   },
   darkMode: "class",
   plugins: [],
-}
+};

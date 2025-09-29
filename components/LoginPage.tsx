@@ -1,6 +1,6 @@
 "use client";
 
-import { AuthService } from "@/lib/services";
+import { AuthService } from "@/lib/AuthService";
 import React, { useState } from "react";
 import { FaUser } from "react-icons/fa";
 import { FiLock, FiLogIn } from "react-icons/fi";
@@ -35,7 +35,7 @@ const LoginPage = () => {
         formData.username,
         formData.password
       );
-      toast.success(`Welcome, ${user?.user.username || "user"}!`);
+      toast.success(`Welcome, ${user?.user || "user"}!`);
       window.location.href = "/dashboard"; // redirect
     } catch (error: any) {
       toast.error(error?.response?.data?.detail || "Login failed");

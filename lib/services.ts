@@ -1,4 +1,5 @@
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "@/constants";
+import { LoginResponse, RegisterData, RegisterResponse, User } from "@/types";
 import Cookies from "js-cookie";
 import api from "./api";
 
@@ -24,7 +25,7 @@ export const AuthService = {
 
   login: async (username: string, password: string) => {
     try {
-      const res = await api.post<LoginResponse>(`${baseURL}/login/`, {
+      const res = await api.post<LoginResponse>(`${baseURL}/token/`, {
         username,
         password,
       });
