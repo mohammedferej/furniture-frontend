@@ -1,12 +1,11 @@
-"use client"
+"use client";
 
-import { AuthService } from "@/lib/services";
+import { AuthService } from "@/lib/AuthService";
 import Link from "next/link";
-import React, { useState } from "react";
-import { toast } from "sonner"; // ✅ Using ShadCN toast
-import { FiMail, FiLock, FiUser, FiArrowRight, FiCheck } from "react-icons/fi";
-import { redirect } from "next/dist/server/api-utils";
 import { useRouter } from "next/navigation";
+import React, { useState } from "react";
+import { FiArrowRight, FiCheck, FiLock, FiMail, FiUser } from "react-icons/fi";
+import { toast } from "sonner"; // ✅ Using ShadCN toast
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -25,7 +24,7 @@ const RegisterPage = () => {
     last_name?: string;
     general?: string;
   }
-  const router=useRouter()
+  const router = useRouter();
   const [errors, setErrors] = useState<Errors>({});
   const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -47,11 +46,13 @@ const RegisterPage = () => {
       newErrors.last_name = "Last name is required";
     if (!formData.username.trim()) {
       newErrors.username = "Usernamse is required";
-    } if (!formData.username) {
-  newErrors.username = "Username is required";
-} else if (!/^[a-zA-Z0-9_.-]{3,20}$/.test(formData.username)) {
-  newErrors.username = "Username must be 3–20 characters and can only contain letters, numbers, underscores, dots, or dashes";
-}
+    }
+    if (!formData.username) {
+      newErrors.username = "Username is required";
+    } else if (!/^[a-zA-Z0-9_.-]{3,20}$/.test(formData.username)) {
+      newErrors.username =
+        "Username must be 3–20 characters and can only contain letters, numbers, underscores, dots, or dashes";
+    }
 
     if (!formData.password) {
       newErrors.password = "Password is required";
@@ -73,7 +74,7 @@ const RegisterPage = () => {
     setIsLoading(true);
     try {
       const res = await AuthService.register(formData);
-      console.log(res)
+      console.log(res);
       if (res) {
         setFormData({
           username: "",
@@ -85,7 +86,7 @@ const RegisterPage = () => {
 
         toast.success("Registration successful! .");
         setSuccess(true);
-        router.push("/users")
+        router.push("/users");
       }
     } catch (error: any) {
       if (error?.response?.data) {
@@ -94,7 +95,8 @@ const RegisterPage = () => {
 
         for (const key in backendErrors) {
           if (Array.isArray(backendErrors[key])) {
-            formattedErrors[key as keyof Errors] = backendErrors[key].join("\n");
+            formattedErrors[key as keyof Errors] =
+              backendErrors[key].join("\n");
           } else {
             formattedErrors[key as keyof Errors] = backendErrors[key];
           }
@@ -120,13 +122,13 @@ const RegisterPage = () => {
           <div className="flex justify-center mb-4">
             <FiCheck className="text-green-500 text-4xl" />
           </div>
-          <h2 className="text-2xl font-bold text-neutral-800">Registration Successful</h2>
-          
+          <h2 className="text-2xl font-bold text-neutral-800">
+            Registration Successful
+          </h2>
         </div>
       </div>
     );
   }
-
 
   return (
     <div className=" min-h-screen bg-gradient-to-bl from-indigo-50 via-sky-100 to-blue-200 flex items-center justify-center">
@@ -135,10 +137,10 @@ const RegisterPage = () => {
           <h2 className="text-2xl font-bold text-neutral-800">Register</h2>
         </div>
         {errors.general && (
-  <div className="mb-4 p-3 bg-red-100 text-red-700 text-sm rounded-md">
-    {errors.general}
-  </div>
-)}
+          <div className="mb-4 p-3 bg-red-100 text-red-700 text-sm rounded-md">
+            {errors.general}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
           <div className=" mb-4 w-full flex gap-3">
@@ -162,7 +164,7 @@ const RegisterPage = () => {
                   className={`pl-10 pr-4 py-2 w-full border ${
                     errors.first_name ? "border-red-500" : "border-gray-300"
                   } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors`}
-                  placeholder="John"
+                  // placeholder="name"
                 />
               </div>
               {errors.first_name && (
@@ -190,7 +192,7 @@ const RegisterPage = () => {
                   className={`pl-10 pr-4 py-2 w-full border ${
                     errors.last_name ? "border-red-500" : "border-gray-300"
                   } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors`}
-                  placeholder="Doe"
+                  //placeholder=""
                 />
               </div>
               {errors.last_name && (
@@ -332,6 +334,5 @@ const RegisterPage = () => {
     </div>
   );
 };
-
 
 export default RegisterPage;

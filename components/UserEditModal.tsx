@@ -1,12 +1,19 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { AuthService } from "@/lib/AuthService";
+import { User } from "@/types";
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
-//import { User } from "@/types";
-import { AuthService } from "@/lib/services";
+import { Label } from "./ui/label";
 
 interface UserEditModalProps {
   open: boolean;
@@ -65,32 +72,48 @@ export const UserEditModal: React.FC<UserEditModalProps> = ({
           <DialogTitle>Edit User</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
-          <Input
-            name="first_name"
-            value={formData.first_name}
-            onChange={handleChange}
-            placeholder="First Name"
-          />
-          <Input
-            name="last_name"
-            value={formData.last_name}
-            onChange={handleChange}
-            placeholder="Last Name"
-          />
-          <Input
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-            placeholder="Username"
-          />
+        <div className="space-y-3">
+          {/* First Name */}
+          <div className="flex items-center gap-4">
+            <Label className="w-28">First Name</Label>
+            <Input
+              name="first_name"
+              value={formData.first_name}
+              onChange={handleChange}
+              placeholder="First Name"
+            />
+          </div>
+
+          {/* Last Name */}
+          <div className="flex items-center gap-4">
+            <Label className="w-28">Last Name</Label>
+            <Input
+              name="last_name"
+              value={formData.last_name}
+              onChange={handleChange}
+              placeholder="Last Name"
+            />
+          </div>
+
+          {/* Username */}
+          <div className="flex items-center gap-4">
+            <Label className="w-28">Username</Label>
+            <Input
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              placeholder="Username"
+            />
+          </div>
         </div>
 
         <DialogFooter className="mt-4">
           <Button variant="brand" onClick={onClose}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit} variant="brand">Save</Button>
+          <Button onClick={handleSubmit} variant="brand">
+            Save
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

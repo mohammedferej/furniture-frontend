@@ -1,92 +1,122 @@
-// lib/services/auth.ts
+// lib/AuthService.ts
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "@/constants";
+import { RegisterData, User } from "@/types";
 import Cookies from "js-cookie";
-import api from "./api";
+import { apiRequest } from "./api";
 
-// export const AuthService = {
-//   login: async (username: string, password: string): Promise<LoginResponse> => {
-//     const res = await api.post<LoginResponse>("/auth/token/", {
-//       username,
-//       password,
-//     });
-//     const { access, refresh, user } = res.data;
-
-//     const cookieOptions = {
-//       expires: 1,
-//       secure: process.env.NODE_ENV === "production",
-//     };
-//     Cookies.set(ACCESS_TOKEN, access, cookieOptions);
-//     Cookies.set(REFRESH_TOKEN, refresh, { ...cookieOptions, expires: 7 });
-
-//     return res.data;
-//   },
-
-//   logout: async () => {
-//     const refresh = Cookies.get(REFRESH_TOKEN);
-//     if (refresh) await api.post("/auth/logout/", { refresh_token: refresh });
-//     Cookies.remove(ACCESS_TOKEN);
-//     Cookies.remove(REFRESH_TOKEN);
-//   },
-
-//   getUserProfile: async (): Promise<User | null> => {
-//     try {
-//       const res = await api.get<User>("/auth/profile/");
-//       return res.data;
-//     } catch {
-//       return null;
-//     }
-//   },
-
-//   register: async (data: RegisterData): Promise<RegisterResponse> => {
-//     const res = await api.post<RegisterResponse>("/auth/register/", data);
-//     return res.data;
-//   },
-
-//   // ✅ Permission helpers
-//   hasPermission: (user: User | null, permission: string): boolean => {
-//     if (!user?.groups) return false;
-//     return user.groups.some((g) => g.permissions.includes(permission));
-//   },
-
-//   hasGroup: (user: User | null, groupName: string): boolean => {
-//     if (!user?.groups) return false;
-//     return user.groups.some((g) => g.name === groupName);
-//   },
-// };
+const baseURL = "auth";
 
 export const AuthService = {
   login: async (username: string, password: string) => {
-    const res = await api.post("/auth/token/", { username, password });
-    const { access, refresh } = res.data;
-    Cookies.set(ACCESS_TOKEN, access, {
+    const data = await apiRequest<{
+      access: string;
+      refresh: string;
+      user: User;
+    }>(`${baseURL}/token/`, { method: "POST", json: { username, password } });
+
+    Cookies.set(ACCESS_TOKEN, data.access, {
       expires: 1,
       secure: process.env.NODE_ENV === "production",
+      sameSite: "Lax",
     });
-    Cookies.set(REFRESH_TOKEN, refresh, {
+    Cookies.set(REFRESH_TOKEN, data.refresh, {
       expires: 7,
       secure: process.env.NODE_ENV === "production",
+      sameSite: "Lax",
     });
-    return res.data;
+
+    return data;
   },
 
+  // In AuthService.ts
   logout: async () => {
     try {
-      await api.post("/auth/logout/", {
-        refresh_token: Cookies.get(REFRESH_TOKEN),
+      await apiRequest("auth/logout/", {
+        method: "POST",
+        json: { refresh_token: Cookies.get("refresh_token") },
       });
+    } catch (err) {
+      console.warn(
+        "[AuthService] Logout failed, forcing client-side cleanup:",
+        err
+      );
     } finally {
-      Cookies.remove(ACCESS_TOKEN);
-      Cookies.remove(REFRESH_TOKEN);
+      // ✅ Always clear tokens client-side
+      Cookies.remove("access_token");
+      Cookies.remove("refresh_token");
     }
   },
 
-  getUserProfile: async () => {
-    const res = await api.get("/auth/profile/");
-    return res.data;
+  getUserProfile: async (): Promise<User> => {
+    try {
+      const data = await apiRequest<User>(`${baseURL}/profile/`);
+
+      // Flatten group permissions into main permissions array if needed
+      const groupPermissions =
+        data.groups?.flatMap((group) => group.permissions) || [];
+      const userPermissions = data.permissions || [];
+
+      return {
+        ...data,
+        permissions: Array.from(
+          new Set([...userPermissions, ...groupPermissions])
+        ),
+      };
+    } catch (error) {
+      console.error("[AuthService] getUserProfile:", error);
+      throw error;
+    }
   },
 
-  register: async (data: any) => {
-    const res = await api.post("/auth/register/", data);
-    return res.data;
+  register: async (data: RegisterData) => {
+    return await apiRequest(`${baseURL}/register/`, {
+      method: "POST",
+      json: data,
+    });
+  },
+
+  getUsers: async (): Promise<User[]> => {
+    return await apiRequest<User[]>(`${baseURL}/users/`);
+  },
+
+  getUsersPaginated: async (page = 1, search = "") => {
+    return await apiRequest<{
+      count: number;
+      next: string | null;
+      previous: string | null;
+      results: User[];
+    }>(`${baseURL}/users/`, { searchParams: { page, search } });
+  },
+
+  getUserById: async (userId: string) => {
+    return await apiRequest<User>(`${baseURL}/users/${userId}/`);
+  },
+
+  updateUser: async (userId: string, userData: Partial<User>) => {
+    console.log("userId : ", userId);
+    return await apiRequest<User>(`users/${userId}/`, {
+      method: "PATCH",
+      json: userData,
+    });
+  },
+
+  updateUserWithFormData: async (data: FormData) => {
+    return await apiRequest<User>(`/profile/update/`, {
+      method: "PUT",
+      body: data, // Ky automatically handles FormData headers
+    });
+  },
+
+  deleteUser: async (userId: string) => {
+    return await apiRequest<{ message: string }>(`users/delete/${userId}/`, {
+      method: "DELETE",
+    });
+  },
+
+  blockUser: async (userId: string) => {
+    return await apiRequest<User>(`/users/${userId}/block/`, {
+      method: "PATCH",
+      json: { blocked: true },
+    });
   },
 };

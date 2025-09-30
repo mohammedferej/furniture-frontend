@@ -4,7 +4,7 @@ import { DashboardHeader } from "@/components/dashboard-header";
 import { Footer } from "@/components/footer";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { ACCESS_TOKEN } from "@/constants";
-import { AuthService } from "@/lib/services";
+import { AuthService } from "@/lib/AuthService";
 import { User } from "@/types";
 import Cookies from "js-cookie";
 import { redirect } from "next/navigation";
@@ -21,11 +21,11 @@ const ProtectedPagesLayout = ({ children }: { children: React.ReactNode }) => {
         try {
           const res = await AuthService.getUserProfile();
           if (res) {
-            setUser(res);
+            setUser(res as User); // ✅ type assertion fixes TS2345
           }
         } catch (error) {
           console.error("Failed to fetch user data:", error);
-          AuthService.logout();
+          await AuthService.logout();
         }
       }
       setLoading(false);

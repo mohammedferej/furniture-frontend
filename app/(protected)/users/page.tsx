@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { UserEditModal } from "@/components/UserEditModal";
-import { AuthService } from "@/lib/services";
+import { AuthService } from "@/lib/AuthService";
 import { User } from "@/types";
 import { ColumnDef } from "@tanstack/react-table";
 import { Ban, Edit, Trash2 } from "lucide-react";
@@ -55,6 +55,7 @@ export default function UsersPage() {
   }, [currentPage, debouncedSearch]);
 
   const handleUpdate = (user: User) => {
+    console.log(user);
     setSelectedUser(user);
     setIsModalOpen(true);
   };

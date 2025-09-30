@@ -31,22 +31,28 @@ const LoginPage = () => {
 
     setIsLoading(true);
     try {
-      const user = await AuthService.login(
+      const data = await AuthService.login(
         formData.username,
         formData.password
       );
-      toast.success(`Welcome, ${user?.user || "user"}!`);
-      window.location.href = "/dashboard"; // redirect
-    } catch (error: any) {
-      toast.error(error?.response?.data?.detail || "Login failed");
-      console.error("Login error:", error);
+      toast.success(`Welcome, ${data.user?.username || "user"}!`);
+      window.location.href = "/dashboard";
+    } catch (err: any) {
+      // Client-side toast only
+      if (!err.response) {
+        toast.error("Backend is not running or unreachable ❌");
+      } else if (err.response?.status === 401) {
+        toast.error("Invalid credentials 🚨");
+      } else {
+        toast.error("Login failed");
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="w-full max-w-sm mx-auto bg-white p-6 rounded-xl shadow-lg">
+    <div className="w-full max-w-sm mx-auto bg-white p-6 rounded-xl shadow-lg mt-20">
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Username */}
         <div>

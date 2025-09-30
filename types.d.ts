@@ -1,10 +1,9 @@
 // types.d.ts
 export interface Group {
-  id: string;
+  id: number;
   name: string;
-  permissions: string[]; // permission codenames
+  permissions: string[];
 }
-
 interface User {
   id: string;
   username: string;
@@ -23,9 +22,8 @@ interface User {
   profile_completion_percentage: number;
   is_profile_complete: boolean;
 
-  // NEW: groups & permissions
-  groups?: string[];
-  permissions?: string[];
+  groups: Group[];
+  permissions: string[];
 }
 
 export interface AuthTokens {
