@@ -21,7 +21,7 @@ interface User {
   updated_at: string;
   profile_completion_percentage: number;
   is_profile_complete: boolean;
-
+  is_active: boolean;
   groups: Group[];
   permissions: string[];
 }

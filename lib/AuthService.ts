@@ -108,15 +108,21 @@ export const AuthService = {
   },
 
   deleteUser: async (userId: string) => {
-    return await apiRequest<{ message: string }>(`users/delete/${userId}/`, {
+    return await apiRequest<{ message: string }>(`users/${userId}/`, {
       method: "DELETE",
     });
   },
 
   blockUser: async (userId: string) => {
-    return await apiRequest<User>(`/users/${userId}/block/`, {
+    return await apiRequest<User>(`users/${userId}/block/`, {
       method: "PATCH",
       json: { blocked: true },
+    });
+  },
+
+  unblockUser: async (userId: string) => {
+    return await apiRequest<{ message: string }>(`users/${userId}/unblock/`, {
+      method: "PATCH",
     });
   },
 };

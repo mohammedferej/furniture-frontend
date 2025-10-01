@@ -38,7 +38,9 @@ export default function UsersPage() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  const [actionType, setActionType] = useState<"delete" | "block">("delete");
+  const [actionType, setActionType] = useState<"delete" | "block" | "unblock">(
+    "delete"
+  );
   const [userIdToAction, setUserIdToAction] = useState<string | null>(null);
 
   const fetchUsers = async (page: number) => {
@@ -72,6 +74,12 @@ export default function UsersPage() {
     setIsConfirmOpen(true);
   };
 
+  const handleToggleActiveClick = (userId: string, isBlocked: boolean) => {
+    setActionType(isBlocked ? "unblock" : "block");
+    setUserIdToAction(userId);
+    setIsConfirmOpen(true);
+  };
+
   const confirmAction = async () => {
     if (!userIdToAction) return;
 
@@ -79,14 +87,26 @@ export default function UsersPage() {
       if (actionType === "delete") {
         await AuthService.deleteUser(userIdToAction);
         toast.success("User deleted successfully.");
-      } else {
+      } else if (actionType === "block") {
         await AuthService.blockUser(userIdToAction);
         toast.success("User blocked successfully.");
+      } else if (actionType === "unblock") {
+        await AuthService.unblockUser(userIdToAction);
+        toast.success("User unblocked successfully.");
       }
       fetchUsers(currentPage);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`${actionType} failed`, error);
-      toast.error(`Failed to ${actionType} user.`);
+
+      if (error.response?.status === 404) {
+        toast.error("User not found (maybe the path not correct).");
+      } else if (error.response?.status === 403) {
+        toast.error("You don't have permission to perform this action.");
+      } else if (error.response?.status === 401) {
+        toast.error("You are not authorized. Please login again.");
+      } else {
+        toast.error(`Failed to ${actionType} user. Please try again.`);
+      }
     } finally {
       setIsConfirmOpen(false);
       setUserIdToAction(null);
@@ -120,6 +140,8 @@ export default function UsersPage() {
       header: "Actions",
       cell: ({ row }) => {
         const user = row.original;
+        const isBlocked = !user.is_active;
+
         return (
           <div className="flex gap-2">
             <Button
@@ -130,23 +152,23 @@ export default function UsersPage() {
               <Edit className="size-4" />
               Update
             </Button>
+
             <Button
               size="sm"
               variant="delete"
-              //  className="hover:bg-red-100 text-red-600"
               onClick={() => handleDeleteClick(user.id)}
             >
               <Trash2 className="size-4" />
               Delete
             </Button>
+
             <Button
               size="sm"
-              variant="block"
-              // className="hover:bg-yellow-100 text-yellow-600"
-              onClick={() => handleBlockClick(user.id)}
+              variant={isBlocked ? "brand" : "block"}
+              onClick={() => handleToggleActiveClick(user.id, isBlocked)}
             >
               <Ban className="size-4" />
-              Block
+              {isBlocked ? "Unblock" : "Block"}
             </Button>
           </div>
         );
